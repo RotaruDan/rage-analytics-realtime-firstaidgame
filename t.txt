@@ -1,0 +1,81 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Gleaner Real Time 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[WARNING] The POM for org.apache.lucene:lucene-core:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-join:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-queryparser:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-misc:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-highlighter:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-sandbox:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-spatial3d:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-backward-codecs:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-spatial-extras:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-grouping:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-analyzers-common:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-memory:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-queries:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-spatial:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[WARNING] The POM for org.apache.lucene:lucene-suggest:jar:6.0.0-snapshot-f0aa4fc is missing, no dependency information available
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ real-time ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory D:\rage\rage-analytics-realtime\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ real-time ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 15 source files to D:\rage\rage-analytics-realtime\target\classes
+[WARNING] /D:/rage/rage-analytics-realtime/src/main/java/es/eucm/gleaner/realtime/utils/DBUtils.java: Some input files use unchecked or unsafe operations.
+[WARNING] /D:/rage/rage-analytics-realtime/src/main/java/es/eucm/gleaner/realtime/utils/DBUtils.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ real-time ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ real-time ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 4 source files to D:\rage\rage-analytics-realtime\target\test-classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/topologies/RealtimeTopologyTest.java: Some input files use unchecked or unsafe operations.
+[WARNING] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/topologies/RealtimeTopologyTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 2 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/topologies/RealtimeTopologyTest.java:[63,17] method prepareTest in class es.eucm.gleaner.realtime.topologies.RealtimeTopology cannot be applied to given types;
+  required: storm.trident.spout.ITridentSpout<T>,storm.trident.state.StateFactory
+  found: storm.trident.testing.FeederBatchSpout,es.eucm.gleaner.realtime.topologies.RealtimeTopologyTest.Factory,es.eucm.gleaner.realtime.topologies.RealtimeTopologyTest.Factory
+  reason: cannot infer type-variable(s) T
+    (actual and formal argument lists differ in length)
+[ERROR] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/KafkaTest.java:[35,43] cannot find symbol
+  symbol:   class MongoStateFactory
+  location: class es.eucm.gleaner.realtime.KafkaTest
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.181 s
+[INFO] Finished at: 2016-09-10T23:19:17+02:00
+[INFO] Final Memory: 30M/340M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:testCompile (default-testCompile) on project real-time: Compilation failure: Compilation failure:
+[ERROR] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/topologies/RealtimeTopologyTest.java:[63,17] method prepareTest in class es.eucm.gleaner.realtime.topologies.RealtimeTopology cannot be applied to given types;
+[ERROR] required: storm.trident.spout.ITridentSpout<T>,storm.trident.state.StateFactory
+[ERROR] found: storm.trident.testing.FeederBatchSpout,es.eucm.gleaner.realtime.topologies.RealtimeTopologyTest.Factory,es.eucm.gleaner.realtime.topologies.RealtimeTopologyTest.Factory
+[ERROR] reason: cannot infer type-variable(s) T
+[ERROR] (actual and formal argument lists differ in length)
+[ERROR] /D:/rage/rage-analytics-realtime/src/test/java/es/eucm/gleaner/realtime/KafkaTest.java:[35,43] cannot find symbol
+[ERROR] symbol:   class MongoStateFactory
+[ERROR] location: class es.eucm.gleaner.realtime.KafkaTest
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
