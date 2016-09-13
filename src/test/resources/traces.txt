@@ -7,3 +7,4 @@
 2,1473345862931,selected,question,alternativeId,alternativeOption,NotaAT,54
 2,1473345862931,selected,question,alternativeId,alternativeOption,NotaDT,65
 2,1473345862931,selected,question,alternativeId,alternativeOption,NotaINC,19
+2,1473345862931,accessed,level,level3
