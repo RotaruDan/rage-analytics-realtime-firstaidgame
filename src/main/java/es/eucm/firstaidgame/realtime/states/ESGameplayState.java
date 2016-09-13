@@ -41,181 +41,184 @@ import static org.elasticsearch.common.xcontent.XContentFactory.*;
 
 public class ESGameplayState extends GameplayState {
 
-    public static final String STORED_KEY = "stored";
-    public static final String RAGE_OPAQUE_VALUES_DOCUMENT_TYPE = "opaquevalues";
-    public static final String RAGE_TRACES_DOCUMENT_TYPE = "traces";
-    public static final String RAGE_RESULTS_DOCUMENT_TYPE = "results";
+	public static final String STORED_KEY = "stored";
+	public static final String RAGE_OPAQUE_VALUES_DOCUMENT_TYPE = "opaquevalues";
+	public static final String RAGE_TRACES_DOCUMENT_TYPE = "traces";
+	public static final String RAGE_RESULTS_DOCUMENT_TYPE = "results";
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ESGameplayState.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(ESGameplayState.class);
 
-    private final TransportClient client;
-    private String opaqueValuesIndex, resultsIndex;
+	private final TransportClient client;
+	private String opaqueValuesIndex, resultsIndex;
 
-    public ESGameplayState(TransportClient client, String sessionId) {
-        this.client = client;
-        opaqueValuesIndex = DBUtils.getOpaqueValuesIndex(sessionId);
-        resultsIndex = DBUtils.getResultsIndex(sessionId);
-    }
+	public ESGameplayState(TransportClient client, String sessionId) {
+		this.client = client;
+		opaqueValuesIndex = DBUtils.getOpaqueValuesIndex(sessionId);
+		resultsIndex = DBUtils.getResultsIndex(sessionId);
+	}
 
-    @Override
-    public void setProperty(String versionId, String gameplayId, String key,
-                            Object value) {
+	@Override
+	public void setProperty(String versionId, String gameplayId, String key,
+			Object value) {
 
-        try {
-            key = key.replace(".", "-");
-            UpdateRequest updateRequest = new UpdateRequest(resultsIndex,
-                    RAGE_RESULTS_DOCUMENT_TYPE, gameplayId).doc(
-                    jsonBuilder().startObject().field(key, value)
-                            .field(STORED_KEY, new Date())).docAsUpsert(true);
-            client.update(updateRequest).get();
+		try {
+			key = key.replace(".", "-");
+			UpdateRequest updateRequest = new UpdateRequest(resultsIndex,
+					RAGE_RESULTS_DOCUMENT_TYPE, gameplayId).doc(
+					jsonBuilder().startObject().field(key, value)
+							.field(STORED_KEY, new Date())).docAsUpsert(true);
+			client.update(updateRequest).get();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void setOpaqueValue(String versionId, String gameplayId,
-                               List<Object> keys, OpaqueValue value) {
+	@Override
+	public void setOpaqueValue(String versionId, String gameplayId,
+			List<Object> keys, OpaqueValue value) {
 
-        setProperty(versionId, gameplayId, buildKey(keys), value.getCurr());
+		setProperty(versionId, gameplayId, buildKey(keys), value.getCurr());
 
-        String key = toKey(gameplayId, keys);
+		String key = toKey(gameplayId, keys);
 
-        try {
-            UpdateRequest updateRequest = new UpdateRequest(opaqueValuesIndex,
-                    RAGE_OPAQUE_VALUES_DOCUMENT_TYPE, key).doc(
-                    jsonBuilder().startObject().field(KEY_KEY, key)
-                            .field(VALUE_KEY, toDBObject(value))).docAsUpsert(
-                    true);
-            client.update(updateRequest).get();
-        } catch (Exception e) {
-            LOG.error("Error setting property " + key + "=" + value, e);
-        }
-    }
+		try {
+			UpdateRequest updateRequest = new UpdateRequest(opaqueValuesIndex,
+					RAGE_OPAQUE_VALUES_DOCUMENT_TYPE, key).doc(
+					jsonBuilder().startObject().field(KEY_KEY, key)
+							.field(VALUE_KEY, toDBObject(value))).docAsUpsert(
+					true);
+			client.update(updateRequest).get();
+		} catch (Exception e) {
+			LOG.error("Error setting property " + key + "=" + value, e);
+		}
+	}
 
-    @Override
-    public OpaqueValue getOpaqueValue(String versionId, String gameplayId,
-                                      List<Object> keys) {
+	@Override
+	public OpaqueValue getOpaqueValue(String versionId, String gameplayId,
+			List<Object> keys) {
 
-        String key = toKey(gameplayId, keys);
+		String key = toKey(gameplayId, keys);
 
-        try {
-            SearchResponse response = client.prepareSearch(opaqueValuesIndex)
-                    .setTypes(RAGE_OPAQUE_VALUES_DOCUMENT_TYPE)
-                    .setQuery(QueryBuilders.termQuery(KEY_KEY, key))
-                            // Query
-                    .setFrom(0).setSize(1).setExplain(true).execute()
-                    .actionGet();
+		try {
+			SearchResponse response = client.prepareSearch(opaqueValuesIndex)
+					.setTypes(RAGE_OPAQUE_VALUES_DOCUMENT_TYPE)
+					.setQuery(QueryBuilders.termQuery(KEY_KEY, key))
+					// Query
+					.setFrom(0).setSize(1).setExplain(true).execute()
+					.actionGet();
 
-            Map<String, SearchHitField> fields = response.getHits().getAt(0)
-                    .getFields();
+			Map<String, SearchHitField> fields = response.getHits().getAt(0)
+					.getFields();
 
-            return fields == null ? null : toOpaqueValue(fields);
+			return fields == null ? null : toOpaqueValue(fields);
 
-        } catch (Exception e) {
-            LOG.error("Error querying opaque value " + key, e);
+		} catch (Exception e) {
+			LOG.error("Error querying opaque value " + key, e);
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 
-    private String toKey(String gameplayId, List<Object> key) {
-        String result = gameplayId;
-        for (Object o : key) {
-            result += o;
-        }
-        return result;
-    }
+	private String toKey(String gameplayId, List<Object> key) {
+		String result = gameplayId;
+		for (Object o : key) {
+			result += o;
+		}
+		return result;
+	}
 
-    private Map toDBObject(OpaqueValue value) {
-        Map dbObject = new HashMap();
-        dbObject.put(TRANSACTION_ID, value.getCurrTxid());
-        dbObject.put(PREVIOUS_VALUE_ID, value.getPrev());
-        dbObject.put(CURRENT_VALUE_ID, value.getCurr());
-        return dbObject;
-    }
+	private Map toDBObject(OpaqueValue value) {
+		Map dbObject = new HashMap();
+		dbObject.put(TRANSACTION_ID, value.getCurrTxid());
+		dbObject.put(PREVIOUS_VALUE_ID, value.getPrev());
+		dbObject.put(CURRENT_VALUE_ID, value.getCurr());
+		return dbObject;
+	}
 
-    private String buildKey(List<Object> keys) {
-        String result = "";
-        for (Object key : keys) {
-            result += key + ".";
-        }
-        return result.substring(0, result.length() - 1);
-    }
+	private String buildKey(List<Object> keys) {
+		String result = "";
+		for (Object key : keys) {
+			result += key + ".";
+		}
+		return result.substring(0, result.length() - 1);
+	}
 
-    private OpaqueValue toOpaqueValue(Map<String, SearchHitField> dbObject) {
-        Map opaqueValue = dbObject.get(VALUE_KEY).value();
-        return new OpaqueValue((Long) opaqueValue.get(TRANSACTION_ID),
-                opaqueValue.get(CURRENT_VALUE_ID),
-                opaqueValue.get(PREVIOUS_VALUE_ID));
-    }
+	private OpaqueValue toOpaqueValue(Map<String, SearchHitField> dbObject) {
+		Map opaqueValue = dbObject.get(VALUE_KEY).value();
+		return new OpaqueValue((Long) opaqueValue.get(TRANSACTION_ID),
+				opaqueValue.get(CURRENT_VALUE_ID),
+				opaqueValue.get(PREVIOUS_VALUE_ID));
+	}
 
-    public void bulkUpdateIndices(List<TridentTuple> inputs) {
+	public void bulkUpdateIndices(List<TridentTuple> inputs) {
 
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-        for (TridentTuple input : inputs) {
-            Document<Map> doc = (Document<Map>) input
-                    .getValueByField("document");
-            Map source = doc.getSource();
-            IndexRequestBuilder request = client.prepareIndex(doc.getName(),
-                    doc.getType(), doc.getId()).setSource(source);
+		BulkRequestBuilder bulkRequest = client.prepareBulk();
+		for (TridentTuple input : inputs) {
+			Document<Map> doc = (Document<Map>) input
+					.getValueByField("document");
+			Map source = doc.getSource();
+			IndexRequestBuilder request = client.prepareIndex(doc.getName(),
+					doc.getType(), doc.getId()).setSource(source);
 
-            bulkRequest.add(request);
-        }
+			bulkRequest.add(request);
+		}
 
-        if (bulkRequest.numberOfActions() > 0) {
-            try {
-                BulkResponse response = bulkRequest.execute().actionGet();
-                if (response.hasFailures()) {
-                    LOG.error("BulkResponse has failures : {}",
-                            response.buildFailureMessage());
-                }
-            } catch (Exception e) {
-                LOG.error(
-                        "error while executing bulk request to elasticsearch, "
-                                + "failed to store data into elasticsearch", e);
-            }
-        }
+		if (bulkRequest.numberOfActions() > 0) {
+			try {
+				BulkResponse response = bulkRequest.execute().actionGet();
+				if (response.hasFailures()) {
+					LOG.error("BulkResponse has failures : {}",
+							response.buildFailureMessage());
+				}
+			} catch (Exception e) {
+				LOG.error(
+						"error while executing bulk request to elasticsearch, "
+								+ "failed to store data into elasticsearch", e);
+			}
+		}
 
-    }
+	}
 
-    public void bulkUpdateVariables(List<TridentTuple> inputs) {
+	public void bulkUpdateVariables(List<TridentTuple> inputs) {
 
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-        for (TridentTuple input : inputs) {
-            Document<Map> doc = (Document<Map>) input
-                    .getValueByField("document");
+		BulkRequestBuilder bulkRequest = client.prepareBulk();
+		for (TridentTuple input : inputs) {
+			Document<Map> doc = (Document<Map>) input
+					.getValueByField("document");
 
-            Map source = doc.getSource();
+			Map source = doc.getSource();
 
-            if (source != null) {
-                IndexRequestBuilder request = client.prepareIndex(doc.getName(),
-                        doc.getType(), doc.getId()).setSource(source);
+			if (source != null) {
+				IndexRequestBuilder request = client.prepareIndex(
+						doc.getName(), doc.getType(), doc.getId()).setSource(
+						source);
 
-                bulkRequest.add(request);
-            } else {
-                UpdateRequest updateRequest = new UpdateRequest(doc.getName(), doc.getType(), doc.getId())
-                        .script(new Script(doc.getScript(), ScriptService.ScriptType.INLINE, null, null))
-                        .docAsUpsert(true);
+				bulkRequest.add(request);
+			} else {
+				UpdateRequest updateRequest = new UpdateRequest(doc.getName(),
+						doc.getType(), doc.getId()).script(
+						new Script(doc.getScript(),
+								ScriptService.ScriptType.INLINE, null, null))
+						.docAsUpsert(true);
 
-                bulkRequest.add(updateRequest);
-            }
-        }
+				bulkRequest.add(updateRequest);
+			}
+		}
 
-        if (bulkRequest.numberOfActions() > 0) {
-            try {
-                BulkResponse response = bulkRequest.execute().actionGet();
-                if (response.hasFailures()) {
-                    LOG.error("BulkResponse has failures : {}",
-                            response.buildFailureMessage());
-                }
-            } catch (Exception e) {
-                LOG.error(
-                        "error while executing bulk request to elasticsearch, "
-                                + "failed to store data into elasticsearch", e);
-            }
-        }
-    }
+		if (bulkRequest.numberOfActions() > 0) {
+			try {
+				BulkResponse response = bulkRequest.execute().actionGet();
+				if (response.hasFailures()) {
+					LOG.error("BulkResponse has failures : {}",
+							response.buildFailureMessage());
+				}
+			} catch (Exception e) {
+				LOG.error(
+						"error while executing bulk request to elasticsearch, "
+								+ "failed to store data into elasticsearch", e);
+			}
+		}
+	}
 }

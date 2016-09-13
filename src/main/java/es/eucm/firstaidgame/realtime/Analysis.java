@@ -25,27 +25,28 @@ import java.util.Map;
 
 public class Analysis {
 
-    /**
-     * Builds a KafkaTopology
-     * @param conf
-     * @param sessionId
-     * @param zookeeperUrl
-     * @return a topology that connects to kafka and performs the analysis
-     */
-    private static StormTopology buildTopology(Map conf, String sessionId,
-                                               String zookeeperUrl) {
-        DBUtils.startRealtime(sessionId);
-        KafkaTopology kafkaTopology = new KafkaTopology(sessionId);
-        String elasticSearchUrl = conf.get("elasticsearchUrl").toString();
-        EsConfig esConfig = new EsConfig(elasticSearchUrl, sessionId);
-        kafkaTopology.prepare(zookeeperUrl, new ESStateFactory(esConfig));
-        return kafkaTopology.build();
-    }
+	/**
+	 * Builds a KafkaTopology
+	 * 
+	 * @param conf
+	 * @param sessionId
+	 * @param zookeeperUrl
+	 * @return a topology that connects to kafka and performs the analysis
+	 */
+	private static StormTopology buildTopology(Map conf, String sessionId,
+			String zookeeperUrl) {
+		DBUtils.startRealtime(sessionId);
+		KafkaTopology kafkaTopology = new KafkaTopology(sessionId);
+		String elasticSearchUrl = conf.get("elasticsearchUrl").toString();
+		EsConfig esConfig = new EsConfig(elasticSearchUrl, sessionId);
+		kafkaTopology.prepare(zookeeperUrl, new ESStateFactory(esConfig));
+		return kafkaTopology.build();
+	}
 
-    // Storm flux Start-up function
-    public StormTopology getTopology(Map<String, Object> conf) {
-        String sessionId = conf.get("sessionId").toString();
-        String zookeeperUrl = conf.get("zookeeperUrl").toString();
-        return buildTopology(conf, sessionId, zookeeperUrl);
-    }
+	// Storm flux Start-up function
+	public StormTopology getTopology(Map<String, Object> conf) {
+		String sessionId = conf.get("sessionId").toString();
+		String zookeeperUrl = conf.get("zookeeperUrl").toString();
+		return buildTopology(conf, sessionId, zookeeperUrl);
+	}
 }

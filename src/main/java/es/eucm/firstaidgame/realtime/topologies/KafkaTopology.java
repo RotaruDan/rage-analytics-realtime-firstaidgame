@@ -34,8 +34,7 @@ public class KafkaTopology extends RealtimeTopology {
 		this.sessionId = sessionId;
 	}
 
-	public void prepare(String zookeeperUrl,
-						ESStateFactory elasticStateFactory) {
+	public void prepare(String zookeeperUrl, ESStateFactory elasticStateFactory) {
 		BrokerHosts zk = new ZkHosts(zookeeperUrl);
 		TridentKafkaConfig spoutConf = new TridentKafkaConfig(zk, sessionId,
 				sessionId);

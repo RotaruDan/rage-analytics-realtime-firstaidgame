@@ -25,27 +25,27 @@ import storm.trident.spout.ITridentSpout;
 
 public class RealtimeTopology extends TridentTopology {
 
-    public void prepareTest(ITridentSpout spout, ESStateFactory elasticStateFactory) {
-        prepare(newStream("traces", spout), elasticStateFactory);
-    }
+	public void prepareTest(ITridentSpout spout,
+			ESStateFactory elasticStateFactory) {
+		prepare(newStream("traces", spout), elasticStateFactory);
+	}
 
-    public void prepare(Stream traces, ESStateFactory elasticStateFactory) {
+	public void prepare(Stream traces, ESStateFactory elasticStateFactory) {
 
-        Stream tracesStream = createTracesStream(traces);
+		Stream tracesStream = createTracesStream(traces);
 
-        /** ---> Analysis definition <--- **/
+		/** ---> Analysis definition <--- **/
 
-        tracesStream
-                .each(new Fields("trace"),
-                        new DocumentBuilder(elasticStateFactory
-                                .getConfig().getSessionId(), "trace"),
-                        new Fields("document"))
-                .partitionPersist(elasticStateFactory,
-                        new Fields("document"), new TraceStateUpdater());
+		tracesStream.each(
+				new Fields("trace"),
+				new DocumentBuilder(elasticStateFactory.getConfig()
+						.getSessionId(), "trace"), new Fields("document"))
+				.partitionPersist(elasticStateFactory, new Fields("document"),
+						new TraceStateUpdater());
 
-    }
+	}
 
-    protected Stream createTracesStream(Stream stream) {
-        return stream;
-    }
+	protected Stream createTracesStream(Stream stream) {
+		return stream;
+	}
 }
