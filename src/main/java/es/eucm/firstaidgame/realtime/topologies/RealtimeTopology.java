@@ -79,7 +79,7 @@ public class RealtimeTopology extends TridentTopology {
 						new Fields("versionId", "gameplayId", "p", "v"),
 						gameplayStateUpdater);
 
-		// Alternatives processing
+		// Alternatives (selected & unlocked) processing
 		gameplayIdStream
 				.each(new Fields("event", "trace"),
 						new FieldValuesOrFilter("event", "selected", "unlocked"))
@@ -95,11 +95,11 @@ public class RealtimeTopology extends TridentTopology {
 				.persistentAggregate(elasticStateFactory, new Count(),
 						new Fields("count"));
 
-		// Accessible and Initialized processing
+		// Accessible (accessed & skipped)), GameObject (interacted & used) and Completable (initialized) processing
 		gameplayIdStream
 				.each(new Fields("event", "trace"),
 						new FieldValuesOrFilter("event", "accessed", "skipped",
-								"initialized"))
+								"initialized", "interacted", "used"))
 				.each(new Fields("trace"),
 						new TraceFieldExtractor("target", "type"),
 						new Fields("target", "type"))
@@ -127,7 +127,7 @@ public class RealtimeTopology extends TridentTopology {
 						new Fields("versionId", "gameplayId", "p", "v"),
 						gameplayStateUpdater);
 
-		// Completable (Completed) processing
+		// Completable (Completed) processing for field "success"
 		gameplayIdStream
 				.each(new Fields("event", "trace"),
 						new FieldValueFilter("event", "completed"))
@@ -142,6 +142,7 @@ public class RealtimeTopology extends TridentTopology {
 						new Fields("versionId", "gameplayId", "p", "v"),
 						gameplayStateUpdater);
 
+		// Completable (Completed) processing for field "score"
 		gameplayIdStream
 				.each(new Fields("event", "trace"),
 						new FieldValueFilter("event", "completed"))
