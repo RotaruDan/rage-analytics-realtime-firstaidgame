@@ -13,37 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package es.eucm.firstaidgame.realtime.states;
+package es.eucm.firstaidgame.realtime.functions;
 
+import storm.trident.operation.Function;
 import storm.trident.operation.TridentCollector;
 import storm.trident.operation.TridentOperationContext;
-import storm.trident.state.StateUpdater;
 import storm.trident.tuple.TridentTuple;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Logger;
 
-public class GameplayStateUpdater implements StateUpdater<GameplayState> {
+public class SimplePropertyCreator implements Function {
+
+	private static final Logger LOG = Logger
+			.getLogger(SimplePropertyCreator.class.getSimpleName());
+
+	private String valueField;
+
+	private String key;
+
+	public SimplePropertyCreator(String valueField, String key) {
+		this.valueField = valueField;
+		this.key = key;
+	}
 
 	@Override
-	public void updateState(GameplayState state, List<TridentTuple> tuples,
-			TridentCollector collector) {
-		for (TridentTuple tuple : tuples) {
-			String versionId = tuple.getStringByField("versionId");
-			String gameplayId = tuple.getStringByField("gameplayId");
-			String property = tuple.getStringByField("p");
-			Object value = tuple.getValueByField("v");
-			state.setProperty(versionId, gameplayId, property, value);
-		}
+	public void execute(TridentTuple tuple, TridentCollector collector) {
+		LOG.info("extractinng key " + key + ", value field "
+				+ tuple.getValueByField(valueField));
+		collector.emit(Arrays.asList(key, tuple.getValueByField(valueField)));
 	}
 
 	@Override
 	public void prepare(Map conf, TridentOperationContext context) {
-
 	}
 
 	@Override
 	public void cleanup() {
-
 	}
 }

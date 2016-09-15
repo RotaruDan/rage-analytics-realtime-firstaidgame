@@ -52,7 +52,7 @@ public class DBUtils {
 	}
 
 	public static String getResultsIndex(String sessionId) {
-		return getTracesIndex(sessionId);
+		return "results-" + getTracesIndex(sessionId);
 	}
 
 	public static String getTracesIndex(String sessionId) {

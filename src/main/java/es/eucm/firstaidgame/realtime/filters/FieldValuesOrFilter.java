@@ -21,20 +21,27 @@ import storm.trident.tuple.TridentTuple;
 
 import java.util.Map;
 
-public class FieldValueFilter implements Filter {
+public class FieldValuesOrFilter implements Filter {
 
 	private String field;
 
-	private Object value;
+	private Object[] values;
 
-	public FieldValueFilter(String field, Object value) {
+	public FieldValuesOrFilter(String field, Object... values) {
 		this.field = field;
-		this.value = value;
+		this.values = values;
 	}
 
 	@Override
 	public boolean isKeep(TridentTuple objects) {
-		return value.equals(objects.getValueByField(field));
+		Object valueField = objects.getValueByField(field);
+		for (int i = 0; i < values.length; ++i) {
+			if (values[i].equals(valueField)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

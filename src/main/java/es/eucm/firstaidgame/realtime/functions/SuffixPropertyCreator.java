@@ -13,37 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package es.eucm.firstaidgame.realtime.states;
+package es.eucm.firstaidgame.realtime.functions;
 
+import storm.trident.operation.Function;
 import storm.trident.operation.TridentCollector;
 import storm.trident.operation.TridentOperationContext;
-import storm.trident.state.StateUpdater;
 import storm.trident.tuple.TridentTuple;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
-public class GameplayStateUpdater implements StateUpdater<GameplayState> {
+public class SuffixPropertyCreator implements Function {
+
+	private final String suffix;
+	private String valueField;
+
+	private String[] keysField;
+
+	public SuffixPropertyCreator(String valueField, String suffix,
+			String... keysField) {
+		this.valueField = valueField;
+		this.keysField = keysField;
+		this.suffix = suffix;
+	}
 
 	@Override
-	public void updateState(GameplayState state, List<TridentTuple> tuples,
-			TridentCollector collector) {
-		for (TridentTuple tuple : tuples) {
-			String versionId = tuple.getStringByField("versionId");
-			String gameplayId = tuple.getStringByField("gameplayId");
-			String property = tuple.getStringByField("p");
-			Object value = tuple.getValueByField("v");
-			state.setProperty(versionId, gameplayId, property, value);
+	public void execute(TridentTuple tuple, TridentCollector collector) {
+		collector.emit(Arrays.asList(toPropertyKey(tuple),
+				tuple.getValueByField(valueField)));
+	}
+
+	public String toPropertyKey(TridentTuple tuple) {
+		String result = "";
+		for (String key : keysField) {
+			result += tuple.getStringByField(key) + ".";
 		}
+		return result + suffix;
 	}
 
 	@Override
 	public void prepare(Map conf, TridentOperationContext context) {
-
 	}
 
 	@Override
 	public void cleanup() {
-
 	}
 }

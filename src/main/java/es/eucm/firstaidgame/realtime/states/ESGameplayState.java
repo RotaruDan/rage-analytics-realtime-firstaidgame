@@ -23,6 +23,7 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptService;
@@ -63,11 +64,19 @@ public class ESGameplayState extends GameplayState {
 			Object value) {
 
 		try {
-			key = key.replace(".", "-");
+			XContentBuilder xContentBuilder = jsonBuilder().startObject();
+
+			String[] keys = key.split("\\.");
+			for (int i = 0; i < keys.length - 1; ++i) {
+				xContentBuilder = xContentBuilder.startObject(keys[i]);
+			}
+			xContentBuilder.field(keys[keys.length - 1], value);
+			for (int i = 0; i < keys.length - 1; ++i) {
+				xContentBuilder = xContentBuilder.endObject();
+			}
 			UpdateRequest updateRequest = new UpdateRequest(resultsIndex,
 					RAGE_RESULTS_DOCUMENT_TYPE, gameplayId).doc(
-					jsonBuilder().startObject().field(key, value)
-							.field(STORED_KEY, new Date())).docAsUpsert(true);
+					xContentBuilder.endObject()).docAsUpsert(true);
 			client.update(updateRequest).get();
 
 		} catch (Exception e) {
